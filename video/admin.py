@@ -1,3 +1,15 @@
 from django.contrib import admin
+from video_encoding.admin import FormatInline
 
-# Register your models here.
+from .models import Video
+
+
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    inlines = (FormatInline, )
+    list_display = ('title', )
+    fields = ('title', 'width', 'height', 'duration', 'file',)
+    readonly_fields = ('width', 'height', 'duration')
+    search_fields = ['title']
