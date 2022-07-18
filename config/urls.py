@@ -20,3 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls'))
 ]
+
+urlpatterns += [
+    path('django-rq/', include('django_rq.urls'))
+]

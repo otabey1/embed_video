@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'video_encoding',
+    'django_rq',
     'celery',
     'video'
 ]
@@ -158,3 +161,30 @@ CELERY_RESULT_SERIALIZER = 'json'
 # SMS_USERNAME = env('SMS_USERNAME')
 # SMS_PASSWORD = env('SMS_PASSWORD')
 ###############################################
+
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DEFAULT_TIMEOUT': 360,
+    },
+    # 'with-sentinel': {
+    #     'SENTINELS': [('localhost', 26736), ('localhost', 26737)],
+    #     'MASTER_NAME': 'redismaster',
+    #     'DB': 0,
+    #     'SOCKET_TIMEOUT': None,
+    #     'CONNECTION_KWARGS': {
+    #         'socket_connect_timeout': 0.3
+    #     },
+    # },
+    'high': {
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/'), # If you're on Heroku
+        'DEFAULT_TIMEOUT': 500,
+    },
+    'low': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    }
+}

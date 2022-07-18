@@ -3,13 +3,16 @@ from django.dispatch import receiver
 from video_encoding import signals
 from typing import Type
 from video_encoding import tasks
-from .models import Video
-from kombu import Queue
+from django_rq import enqueue
 
+from . import tasks as task
+from .models import Video
 
 @receiver(post_save, sender=Video)
 def convert_video(sender, instance, **kwargs):
-    Queue(tasks.convert_all_videos,
+    print("convert_video")
+
+    enqueue(tasks.convert_all_videos,
             instance._meta.app_label,
             instance._meta.model_name,
             instance.pk)
@@ -17,13 +20,16 @@ def convert_video(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Video)
 def create_thumbnail(sender, instance, **kwargs):
-    Queue(tasks.create_thumbnail, instance.pk)
+    print("create_thumbnail")
+    enqueue(task.create_thumbnail, instance.pk)
 
 
 @receiver(signals.encoding_finished, sender=Video)
 def mark_as_finished(sender: Type[Video], instance: Video) -> None:
-   """
-   Mark video as "convertion has been finished".
-   """
-   Video.processed = True
-   Video.save(update_fields=['processed'])
+    print("mark_as_finished")
+    """
+    Mark video as "convertion has been finished".
+    """
+    
+#    video.processed = True
+#    video.save(update_fields=['processed'])
